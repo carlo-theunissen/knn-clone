@@ -31,7 +31,7 @@ def knn(train_X, train_y, test_X, metric, k):
 
 
 if __name__ == '__main__':
-    train_data_X = pd.read_csv("MNIST_train_small.csv").to_numpy()[:100, 1:2]
+    train_data_X = pd.read_csv("MNIST_train_small.csv").to_numpy()[:100, 1:]
     train_data_y = pd.read_csv("MNIST_train_small.csv").to_numpy()[:100, 0]
     test_data_X = pd.read_csv("MNIST_test_small.csv").to_numpy()[:100, 1:]
     test_data_y = pd.read_csv("MNIST_test_small.csv").to_numpy()[:100, 0]
@@ -40,11 +40,11 @@ if __name__ == '__main__':
 
     plt.tight_layout()
 
-    fig, axs = plt.subplots(10, 4, figsize=(50, 100))
+    fig, axs = plt.subplots(5, 2, figsize=(50, 100))
     axs = axs.ravel()
 
     # Pick items at random to show
-    for i in range(10*4):
+    for i in range(5*2):
         idx = np.random.randint(len(results))
         result = results[idx]
 
