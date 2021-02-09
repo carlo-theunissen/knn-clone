@@ -1,7 +1,5 @@
 import multiprocessing
 from collections import Counter
-from random import random
-import numpy as np
 import math
 import pandas as pd
 import matplotlib.pyplot as plt
