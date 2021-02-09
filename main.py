@@ -13,9 +13,11 @@ def cartesian(x_1, x_2):
     return math.sqrt(squared_diffs.sum())
 
 
-def knn(train_X, train_y, test_X, metric, k):
+def knn(train_X, train_y, test_X, metric, k, current_idx=None):
+    if current_idx is not None:
+        print(current_idx)
+
     output = []
-    i = 1
 
     for x in test_X:
         # Compute the distances
@@ -31,9 +33,6 @@ def knn(train_X, train_y, test_X, metric, k):
 
         output.append(most_common)
 
-        print(i)
-        i += 1
-
     return output
 
 
@@ -45,4 +44,5 @@ if __name__ == '__main__':
 
     n_cores = multiprocessing.cpu_count()
 
-    results = Parallel(n_jobs=n_cores)(delayed(knn)(train_data_X, train_data_y, [test_point], cartesian, 3) for test_point in test_data_X)
+    results = Parallel(n_jobs=n_cores)(delayed(knn)(train_data_X, train_data_y, [test_point], cartesian, 3, idx)
+                                       for idx, test_point in enumerate(test_data_X))
