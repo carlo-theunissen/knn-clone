@@ -4,12 +4,12 @@ from joblib import Parallel, delayed
 import numpy as np
 import time
 from tabulate import tabulate
-from KMeans import KMeans
+
+from KMeans import k_means
 
 
 def knn(train_X, train_y, test_X):
-    k_means = KMeans(train_X, train_y)
-    return k_means.test(test_X)
+    return k_means(train_X, train_y, test_X)
 
 
 def run_parallel_knn(train_data_x, train_data_y, validation_x):
