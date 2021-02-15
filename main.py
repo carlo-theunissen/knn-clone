@@ -1,44 +1,21 @@
 import multiprocessing
-from collections import Counter
-import math
 import pandas as pd
 from joblib import Parallel, delayed
 import numpy as np
 import time
 from tabulate import tabulate
-
-from typing import List
-
-
-def cartesian(x_1, x_2):
-    squared_diffs = (x_1 - x_2)**2
-    return math.sqrt(squared_diffs.sum())
+from KMeans import KMeans
 
 
-def knn(train_X, train_y, test_X, metric, k, current_idx=None):
-    output = []
-
-    for x in test_X:
-        # Compute the distances
-        distances = [(idx, metric(x, train_X_elem)) for idx, train_X_elem in enumerate(train_X)]
-        distances = sorted(distances, key=lambda x: x[1])
-        distances = distances[:k]
-
-        # Get the labels of the nearest neighbours
-        nearest_labels = [train_y[distance[0]] for distance in distances]
-        # Break ties in ascending order
-        most_commons = Counter(nearest_labels).most_common()
-        most_common = most_commons[0][0]
-
-        output.append(most_common)
-
-    return output
+def knn(train_X, train_y, test_X):
+    k_means = KMeans(train_X, train_y)
+    return k_means.test(test_X)
 
 
-def run_parallel_knn(train_data_x, train_data_y, validation_x, method, k) -> List[List[int]]:
+def run_parallel_knn(train_data_x, train_data_y, validation_x):
     n_cores = multiprocessing.cpu_count()
-    return Parallel(n_jobs=n_cores)(delayed(knn)(train_data_x, train_data_y, [test_point], method, k, idx)
-                                       for idx, test_point in enumerate(validation_x))
+    return Parallel(n_jobs=n_cores)(delayed(knn)(train_data_x, train_data_y, test_point)
+                                    for _, test_point in enumerate(validation_x))
 
 
 def get_accuracy(predicted, actual):
@@ -61,20 +38,14 @@ def exercise_a():
     a table with the results are printed.
     :return: none
     """
-
-    train_data_x = np.repeat(pd.read_csv("MNIST_train_small.csv").to_numpy()[:, 1:], repeats=1, axis=0)
-    train_data_y = np.repeat(pd.read_csv("MNIST_train_small.csv").to_numpy()[:, 0], repeats=1, axis=0)
-    test_data_x = np.repeat(pd.read_csv("MNIST_test_small.csv").to_numpy()[:, 1:], repeats=1, axis=0)
-    test_data_y = np.repeat(pd.read_csv("MNIST_test_small.csv").to_numpy()[:, 0], repeats=1, axis=0)
-
     result = []
     highest_index = -1
+    predicted = run_parallel_knn(train_data_x, train_data_y, test_data_x)
 
     # run through all ks from 1 to 20, compare the output to calculate the accuracy
     # and put it in the result list.
     for k in range(1, 21):
-        predicted = run_parallel_knn(train_data_x, train_data_y, test_data_x, cartesian, k)
-        accuracy = get_accuracy(list(map(lambda x: x[0], predicted)), test_data_y)
+        accuracy = get_accuracy(list(map(lambda x: x.get_prediction(k), predicted)), test_data_y)
 
         if highest_index == -1 or result[highest_index][1] < accuracy:
             highest_index = k - 1
@@ -89,8 +60,11 @@ def exercise_a():
 
 
 if __name__ == '__main__':
-
+    train_data_x = np.repeat(pd.read_csv("MNIST_train_small.csv").to_numpy()[:, 1:], repeats=1, axis=0)
+    train_data_y = np.repeat(pd.read_csv("MNIST_train_small.csv").to_numpy()[:, 0], repeats=1, axis=0)
+    test_data_x = np.repeat(pd.read_csv("MNIST_test_small.csv").to_numpy()[:, 1:], repeats=1, axis=0)
+    test_data_y = np.repeat(pd.read_csv("MNIST_test_small.csv").to_numpy()[:, 0], repeats=1, axis=0)
     t0 = time.time()
 
     exercise_a()
-    print(time.time()-t0)
+    print(time.time() - t0)
