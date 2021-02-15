@@ -60,7 +60,7 @@ def exercise_a():
 
 
 def exercise_b():
-    correct = [_ for _ in range(20)]
+    correct = [0 for _ in range(20)]
 
     # combine the test and training set
     joined_train_x = np.concatenate((train_data_x, test_data_x), axis=0)
