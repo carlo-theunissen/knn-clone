@@ -59,6 +59,37 @@ def exercise_a():
     print(tabulate(result, headers=['K', 'Accuracy', 'Is Highest']))
 
 
+def exercise_b():
+    correct = [0 for _ in range(20)]
+
+    # combine the test and training set
+    joined_train_x = np.concatenate((train_data_x, test_data_x), axis=0)
+    joined_train_y = np.concatenate((train_data_y, test_data_y), axis=0)
+
+    # now, for every item of this combined set, verify if the k-means algorithm predicts a good label
+    for i in range(len(joined_train_x)):
+
+        # save the to-be removed value in dummy variables
+        dummy_x = joined_train_x[i]
+        dummy_y = joined_train_y[i]
+
+        # remove the dummy variables
+        train_x = np.delete(joined_train_x, i, 0)
+        train_y = np.delete(joined_train_y, i)
+
+        # runs the the knn algorithm
+        predicted = knn(train_x, train_y, dummy_x)
+
+        # count for every k setting if the predicted label is equal to the real one
+        for k in range(1, 21):
+            correct[k-1] += predicted.get_prediction(k) == dummy_y
+
+    max_correct_value = max(correct)
+    print(tabulate(
+        [[k, correct[k-1] / joined_train_x.shape[0], int(correct[k-1] == max_correct_value)] for k in range(1,21)],
+        headers=['K', 'Accuracy', 'Is Highest']))
+
+
 if __name__ == '__main__':
     train_data_x = np.repeat(pd.read_csv("MNIST_train_small.csv").to_numpy()[:, 1:], repeats=1, axis=0)
     train_data_y = np.repeat(pd.read_csv("MNIST_train_small.csv").to_numpy()[:, 0], repeats=1, axis=0)
@@ -66,5 +97,5 @@ if __name__ == '__main__':
     test_data_y = np.repeat(pd.read_csv("MNIST_test_small.csv").to_numpy()[:, 0], repeats=1, axis=0)
     t0 = time.time()
 
-    exercise_a()
+    exercise_b()
     print(time.time() - t0)
