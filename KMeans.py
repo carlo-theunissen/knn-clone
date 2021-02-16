@@ -2,23 +2,17 @@ import math
 from collections import Counter
 
 
-class KMeans:
+def cartesian(x_1, x_2):
+    squared_diffs = (x_1 - x_2) ** 2
+    return math.sqrt(squared_diffs.sum())
 
-    @staticmethod
-    def cartesian(x_1, x_2):
-        squared_diffs = (x_1 - x_2) ** 2
-        return math.sqrt(squared_diffs.sum())
 
-    def __init__(self, train_data_x, train_data_y):
-        self.train_data_x = train_data_x
-        self.train_data_y = train_data_y
+def k_means(train_data_x, train_data_y, test_element_x):
+    distances = [(idx, cartesian(test_element_x, train_element))
+                 for idx, train_element in enumerate(train_data_x)]
 
-    def test(self, test_element_x):
-        distances = [(idx, self.cartesian(test_element_x, train_element))
-                     for idx, train_element in enumerate(self.train_data_x)]
-
-        distances = sorted(distances, key=lambda x: x[1])
-        return KMeansResult(distances=distances, train_data_y=self.train_data_y)
+    distances = sorted(distances, key=lambda x: x[1])
+    return KMeansResult(distances=distances, train_data_y=train_data_y)
 
 
 class KMeansResult:
