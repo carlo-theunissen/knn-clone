@@ -1,4 +1,4 @@
+tabulate==0.8.7
 pandas==1.0.5
 joblib==0.16.0
-matplotlib==3.2.2
 numpy==1.19.5
