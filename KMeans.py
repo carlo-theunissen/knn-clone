@@ -11,10 +11,14 @@ def minkowski(x_1, x_2, p):
     diff = (x_1 - x_2) ** p
     return (diff.sum()) ** (1/p)
 
-
-def k_means(train_data_x, train_data_y, test_element_x):
-    distances = [(idx, cartesian(test_element_x, train_element))
-                 for idx, train_element in enumerate(train_data_x)]
+# p is only used when applying the minkowski distance
+def k_means(train_data_x, train_data_y, test_element_x, distance_metric, p):
+    if(distance_metric == 'cartesian'):
+        distances = [(idx, cartesian(test_element_x, train_element))
+                     for idx, train_element in enumerate(train_data_x)]
+    elif(distance_metric == 'minkowski'):
+        distances = [(idx, minkowski(test_element_x, train_element, p))
+                     for idx, train_element in enumerate(train_data_x)]
 
     distances = sorted(distances, key=lambda x: x[1])
     return KMeansResult(distances=distances, train_data_y=train_data_y)
