@@ -7,6 +7,11 @@ def cartesian(x_1, x_2):
     return math.sqrt(squared_diffs.sum())
 
 
+def minkowski(x_1, x_2, p):
+    diff = (x_1 - x_2) ** p
+    return (diff.sum()) ** (1/p)
+
+
 def k_means(train_data_x, train_data_y, test_element_x):
     distances = [(idx, cartesian(test_element_x, train_element))
                  for idx, train_element in enumerate(train_data_x)]
