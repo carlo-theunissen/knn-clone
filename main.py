@@ -156,7 +156,7 @@ def exercise_c():
             headers=['K', 'Accuracy', 'Is Highest']))
         print('------------------------\n')
     
-    print(('OPTIMAL VALUES FOR P AND K, respectively {opt_p} and {opt_k}').format(opt_p=optimal_p, opt_k=optimal_k))
+    print(('OPTIMAL VALUES FOR P AND K: {opt_p} and {opt_k} with an accuracy of {accu}').format(opt_p=optimal_p, opt_k=optimal_k, accu=highest_accuracy))
 
         
 if __name__ == '__main__':
