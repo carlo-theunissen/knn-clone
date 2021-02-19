@@ -12,7 +12,7 @@ def minkowski(x_1, x_2, p):
     return (diff.sum()) ** (1/p)
 
 # p is only used when applying the minkowski distance
-def k_means(train_data_x, train_data_y, test_element_x, distance_metric, p):
+def k_nn(train_data_x, train_data_y, test_element_x, distance_metric, p):
     if(distance_metric == 'cartesian'):
         distances = [(idx, cartesian(test_element_x, train_element))
                      for idx, train_element in enumerate(train_data_x)]
@@ -21,10 +21,10 @@ def k_means(train_data_x, train_data_y, test_element_x, distance_metric, p):
                      for idx, train_element in enumerate(train_data_x)]
 
     distances = sorted(distances, key=lambda x: x[1])
-    return KMeansResult(distances=distances, train_data_y=train_data_y)
+    return KNNResult(distances=distances, train_data_y=train_data_y)
 
 
-class KMeansResult:
+class KNNResult:
     distances = []
 
     def __init__(self, distances,train_data_y):

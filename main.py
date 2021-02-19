@@ -5,11 +5,11 @@ import numpy as np
 import time
 from tabulate import tabulate
 
-from KMeans import k_means
+from KNN import k_nn
 
 
 def knn(train_X, train_y, test_X, distance, p):
-    return k_means(train_X, train_y, test_X, distance, p)
+    return k_nn(train_X, train_y, test_X, distance, p)
 
 
 def run_parallel_knn(train_data_x, train_data_y, validation_x):
@@ -156,5 +156,5 @@ if __name__ == '__main__':
     test_data_y = np.repeat(pd.read_csv("MNIST_test_small.csv").to_numpy()[:, 0], repeats=1, axis=0)
     t0 = time.time()
 
-    exercise_c()
+    exercise_b()
     print(time.time() - t0)
