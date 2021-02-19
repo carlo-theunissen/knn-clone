@@ -119,6 +119,7 @@ def exercise_b_without_test_set():
     
 
 def exercise_c():
+    optimal_p, optimal_k, highest_accuracy = 0, 0, 0
     for p in range(15):
         correct = [0 for _ in range(20)]
 
@@ -139,14 +140,23 @@ def exercise_c():
             # count for every k setting if the predicted label is equal to the real one
             for k in range(1, 21):
                 correct[k-1] += predicted.get_prediction(k) == dummy_y
-
-        max_correct_value = max(correct)
+                
+                max_correct_value = max(correct)
+                
+                current_accuracy = correct[k-1] / train_data_x.shape[0]
+                
+                if(current_accuracy > highest_accuracy):
+                    optimal_p = p + 1
+                    optimal_k = k
+                    highest_accuracy = current_accuracy
         
         print(('------p={p_value}------').format(p_value=p+1))
-        
         print(tabulate(
             [[k, correct[k-1] / train_data_x.shape[0], int(correct[k-1] == max_correct_value)] for k in range(1,21)],
             headers=['K', 'Accuracy', 'Is Highest']))
+        print('------------------------\n')
+    
+    print(('OPTIMAL VALUES FOR P AND K, respectively {opt_p} and {opt_k}').format(opt_p=optimal_p, opt_k=optimal_k))
 
         
 if __name__ == '__main__':
