@@ -148,7 +148,7 @@ def exercise_c():
             [[k, correct[k-1] / train_data_x.shape[0], int(correct[k-1] == max_correct_value)] for k in range(1,21)],
             headers=['K', 'Accuracy', 'Is Highest']))
 
-
+        
 if __name__ == '__main__':
     train_data_x = np.repeat(pd.read_csv("MNIST_train_small.csv").to_numpy()[:, 1:], repeats=1, axis=0)
     train_data_y = np.repeat(pd.read_csv("MNIST_train_small.csv").to_numpy()[:, 0], repeats=1, axis=0)
@@ -156,5 +156,5 @@ if __name__ == '__main__':
     test_data_y = np.repeat(pd.read_csv("MNIST_test_small.csv").to_numpy()[:, 0], repeats=1, axis=0)
     t0 = time.time()
 
-    exercise_b()
+    exercise_c()
     print(time.time() - t0)
