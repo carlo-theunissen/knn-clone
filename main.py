@@ -8,7 +8,7 @@ from tabulate import tabulate
 from KNN import k_nn
 
 
-def knn(train_X, train_y, test_X, distance, p):
+def knn(train_X, train_y, test_X, distance, p=0):
     return k_nn(train_X, train_y, test_X, distance, p)
 
 
@@ -78,7 +78,7 @@ def exercise_b():
         train_y = np.delete(joined_train_y, i)
 
         # runs the the knn algorithm
-        predicted = knn(train_x, train_y, dummy_x, 'cartesian', 0)
+        predicted = knn(train_x, train_y, dummy_x, 'cartesian')
 
         # count for every k setting if the predicted label is equal to the real one
         for k in range(1, 21):
@@ -106,7 +106,7 @@ def exercise_b_without_test_set():
         train_y = np.delete(train_data_y, i)
 
         # runs the the knn algorithm
-        predicted = knn(train_x, train_y, dummy_x, 'cartesian', 0)
+        predicted = knn(train_x, train_y, dummy_x, 'cartesian')
 
         # count for every k setting if the predicted label is equal to the real one
         for k in range(1, 21):
