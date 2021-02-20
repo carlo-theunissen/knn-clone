@@ -5,11 +5,11 @@ import numpy as np
 import time
 from tabulate import tabulate
 
-from KMeans import k_means
+from KNN import k_nn
 
 
-def knn(train_X, train_y, test_X):
-    return k_means(train_X, train_y, test_X)
+def knn(train_X, train_y, test_X, distance, p=0):
+    return k_nn(train_X, train_y, test_X, distance, p)
 
 
 def run_parallel_knn(train_data_x, train_data_y, validation_x):
@@ -78,7 +78,7 @@ def exercise_b():
         train_y = np.delete(joined_train_y, i)
 
         # runs the the knn algorithm
-        predicted = knn(train_x, train_y, dummy_x)
+        predicted = knn(train_x, train_y, dummy_x, 'cartesian')
 
         # count for every k setting if the predicted label is equal to the real one
         for k in range(1, 21):
@@ -88,8 +88,77 @@ def exercise_b():
     print(tabulate(
         [[k, correct[k-1] / joined_train_x.shape[0], int(correct[k-1] == max_correct_value)] for k in range(1,21)],
         headers=['K', 'Accuracy', 'Is Highest']))
+    
+    
+#not sure whether the cross validation should be done on only the training set    
+def exercise_b_without_test_set():
+    correct = [0 for _ in range(20)]
 
+    # now, for every item of the training set, verify if the k-means algorithm predicts a good label
+    for i in range(len(train_data_x)):
 
+        # save the to-be removed value in dummy variables
+        dummy_x = train_data_x[i]
+        dummy_y = train_data_y[i]
+
+        # remove the dummy variables
+        train_x = np.delete(train_data_x, i, 0)
+        train_y = np.delete(train_data_y, i)
+
+        # runs the the knn algorithm
+        predicted = knn(train_x, train_y, dummy_x, 'cartesian')
+
+        # count for every k setting if the predicted label is equal to the real one
+        for k in range(1, 21):
+            correct[k-1] += predicted.get_prediction(k) == dummy_y
+
+    max_correct_value = max(correct)
+    print(tabulate(
+        [[k, correct[k-1] / train_data_x.shape[0], int(correct[k-1] == max_correct_value)] for k in range(1,21)],
+        headers=['K', 'Accuracy', 'Is Highest']))
+    
+
+def exercise_c():
+    optimal_p, optimal_k, highest_accuracy = 0, 0, 0
+    for p in range(15):
+        correct = [0 for _ in range(20)]
+
+        # now, for every item of the training set, verify if the k-means algorithm predicts a good label
+        for i in range(len(train_data_x)):
+
+            # save the to-be removed value in dummy variables
+            dummy_x = train_data_x[i]
+            dummy_y = train_data_y[i]
+
+            # remove the dummy variables
+            train_x = np.delete(train_data_x, i, 0)
+            train_y = np.delete(train_data_y, i)
+
+            # runs the the knn algorithm
+            predicted = knn(train_x, train_y, dummy_x, 'minkowski', p+1)
+
+            # count for every k setting if the predicted label is equal to the real one
+            for k in range(1, 21):
+                correct[k-1] += predicted.get_prediction(k) == dummy_y
+                
+                max_correct_value = max(correct)
+                
+                current_accuracy = correct[k-1] / train_data_x.shape[0]
+                
+                if(current_accuracy > highest_accuracy):
+                    optimal_p = p + 1
+                    optimal_k = k
+                    highest_accuracy = current_accuracy
+        
+        print(('------p={p_value}------').format(p_value=p+1))
+        print(tabulate(
+            [[k, correct[k-1] / train_data_x.shape[0], int(correct[k-1] == max_correct_value)] for k in range(1,21)],
+            headers=['K', 'Accuracy', 'Is Highest']))
+        print('------------------------\n')
+    
+    print(('OPTIMAL VALUES FOR P AND K: {opt_p} and {opt_k} with an accuracy of {accu}').format(opt_p=optimal_p, opt_k=optimal_k, accu=highest_accuracy))
+
+        
 if __name__ == '__main__':
     train_data_x = np.repeat(pd.read_csv("MNIST_train_small.csv").to_numpy()[:, 1:], repeats=1, axis=0)
     train_data_y = np.repeat(pd.read_csv("MNIST_train_small.csv").to_numpy()[:, 0], repeats=1, axis=0)
@@ -97,5 +166,5 @@ if __name__ == '__main__':
     test_data_y = np.repeat(pd.read_csv("MNIST_test_small.csv").to_numpy()[:, 0], repeats=1, axis=0)
     t0 = time.time()
 
-    exercise_b()
+    exercise_c()
     print(time.time() - t0)
