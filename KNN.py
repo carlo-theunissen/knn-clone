@@ -9,7 +9,11 @@ def cartesian(x_1, x_2):
 
 def minkowski(x_1, x_2, p):
     diff = (np.abs(x_1 - x_2)) ** p
-    return (diff.sum()) ** (1/p)
+    
+    diff_sum = np.abs((diff.sum())) ** (1/p) 
+    #if(np.any(np.isnan(diff_sum))):
+    #    print('INVALID RUNTIMEWARNING!!!!!!!!!!!!!')
+    return diff_sum
 
 # p is only used when applying the minkowski distance
 def k_nn(train_data_x, train_data_y, test_element_x, distance_metric, p):
