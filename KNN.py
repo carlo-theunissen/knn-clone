@@ -2,7 +2,7 @@ import math
 from collections import Counter
 import numpy as np
 
-def cartesian(x_1, x_2):
+def euclidean(x_1, x_2):
     squared_diffs = (x_1 - x_2) ** 2
     return math.sqrt(squared_diffs.sum())
 
@@ -15,14 +15,17 @@ def minkowski(x_1, x_2, p):
     #    print('INVALID RUNTIMEWARNING!!!!!!!!!!!!!')
     return diff_sum
 
+
 # p is only used when applying the minkowski distance
 def k_nn(train_data_x, train_data_y, test_element_x, distance_metric, p):
-    if(distance_metric == 'cartesian'):
-        distances = [(idx, cartesian(test_element_x, train_element))
+    if distance_metric == 'euclidean':
+        distances = [(idx, euclidean(test_element_x, train_element))
                      for idx, train_element in enumerate(train_data_x)]
-    elif(distance_metric == 'minkowski'):
+    elif distance_metric == 'minkowski':
         distances = [(idx, minkowski(test_element_x, train_element, p))
                      for idx, train_element in enumerate(train_data_x)]
+    else:
+        raise AssertionError()
 
     distances = sorted(distances, key=lambda x: x[1])
     return KNNResult(distances=distances, train_data_y=train_data_y)

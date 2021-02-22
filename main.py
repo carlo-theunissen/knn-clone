@@ -4,7 +4,7 @@ from joblib import Parallel, delayed
 import numpy as np
 import time
 from tabulate import tabulate
-
+from sklearn.decomposition import TruncatedSVD
 from KNN import k_nn
 
 
@@ -78,7 +78,7 @@ def exercise_b():
         train_y = np.delete(joined_train_y, i)
 
         # runs the the knn algorithm
-        predicted = knn(train_x, train_y, dummy_x, 'cartesian')
+        predicted = knn(train_x, train_y, dummy_x, 'euclidean')
 
         # count for every k setting if the predicted label is equal to the real one
         for k in range(1, 21):
@@ -106,7 +106,7 @@ def exercise_b_without_test_set():
         train_y = np.delete(train_data_y, i)
 
         # runs the the knn algorithm
-        predicted = knn(train_x, train_y, dummy_x, 'cartesian')
+        predicted = knn(train_x, train_y, dummy_x, 'euclidean')
 
         # count for every k setting if the predicted label is equal to the real one
         for k in range(1, 21):
@@ -157,6 +157,16 @@ def exercise_c():
         print('------------------------\n')
     
     print(('OPTIMAL VALUES FOR P AND K: {opt_p} and {opt_k} with an accuracy of {accu}').format(opt_p=optimal_p, opt_k=optimal_k, accu=highest_accuracy))
+
+
+def exercise_g(n_components=18):
+    global train_data_x
+    global test_data_x
+
+    svd = TruncatedSVD(n_components=n_components)
+    svd.fit(train_data_x)
+    train_data_x = svd.transform(train_data_x)
+    test_data_x = svd.transform(test_data_x)
 
         
 if __name__ == '__main__':
