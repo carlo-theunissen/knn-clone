@@ -194,6 +194,10 @@ def exercise_e():
     print(tabulate(
         [[k, correct[k - 1] / train_data_x_large.shape[0], int(correct[k - 1] == max_correct_value)] for k in range(1, 21)],
         headers=['K', 'Accuracy', 'Is Highest']))
+    with open('table.txt', 'w') as f:
+        f.write(tabulate(
+        [[k, correct[k - 1] / train_data_x_large.shape[0], int(correct[k - 1] == max_correct_value)] for k in range(1, 21)],
+        headers=['K', 'Accuracy', 'Is Highest']))
 
 
 def exercise_g(n_components=18):
