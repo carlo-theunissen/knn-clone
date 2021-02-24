@@ -1,4 +1,7 @@
 import multiprocessing
+import os
+import zipfile
+
 import pandas as pd
 from joblib import Parallel, delayed
 import numpy as np
@@ -12,9 +15,9 @@ def knn(train_X, train_y, test_X, distance, p=0):
     return k_nn(train_X, train_y, test_X, distance, p)
 
 
-def run_parallel_knn(train_data_x, train_data_y, validation_x):
+def run_parallel_knn(train_data_x, train_data_y, validation_x, distance, p=0):
     n_cores = multiprocessing.cpu_count()
-    return Parallel(n_jobs=n_cores)(delayed(knn)(train_data_x, train_data_y, test_point)
+    return Parallel(n_jobs=n_cores)(delayed(knn)(train_data_x, train_data_y, test_point, distance, p=0)
                                     for _, test_point in enumerate(validation_x))
 
 
@@ -88,9 +91,8 @@ def exercise_b():
     print(tabulate(
         [[k, correct[k-1] / joined_train_x.shape[0], int(correct[k-1] == max_correct_value)] for k in range(1,21)],
         headers=['K', 'Accuracy', 'Is Highest']))
-    
-    
-#not sure whether the cross validation should be done on only the training set    
+
+
 def exercise_b_without_test_set():
     correct = [0 for _ in range(20)]
 
@@ -159,6 +161,41 @@ def exercise_c():
     print('OPTIMAL VALUES FOR P AND K: {opt_p} and {opt_k} with an accuracy of {accu}'.format(opt_p=optimal_p, opt_k=optimal_k, accu=highest_accuracy))
 
 
+def exercise_e():
+    n_cores = multiprocessing.cpu_count()
+
+    # now, for every item of the training set, verify if the k-means algorithm predicts a good label
+    def job(i):
+        correct = [0 for _ in range(20)]
+        print(i)
+
+        # save the to-be removed value in dummy variables
+        dummy_x = train_data_x_large[i]
+        dummy_y = train_data_y_large[i]
+
+        # remove the dummy variables
+        train_x = np.delete(train_data_x_large, i, 0)
+        train_y = np.delete(train_data_y_large, i)
+
+
+        # runs the the knn algorithm
+        predicted = knn(train_x, train_y, dummy_x, 'euclidean')
+
+        # count for every k setting if the predicted label is equal to the real one
+        for k in range(1, 21):
+            correct[k-1] = predicted.get_prediction(k) == dummy_y
+
+        return correct
+
+    list_of_corrects = Parallel(n_jobs=n_cores)(delayed(job)(i) for i in range(len(train_data_x_large)))
+    correct = np.array(list_of_corrects).sum(axis=0)
+
+    max_correct_value = max(correct)
+    print(tabulate(
+        [[k, correct[k - 1] / train_data_x_large.shape[0], int(correct[k - 1] == max_correct_value)] for k in range(1, 21)],
+        headers=['K', 'Accuracy', 'Is Highest']))
+
+
 def exercise_g(n_components=18):
     global train_data_x
     global test_data_x
@@ -170,11 +207,22 @@ def exercise_g(n_components=18):
 
         
 if __name__ == '__main__':
-    train_data_x = np.repeat(pd.read_csv("MNIST_train_small.csv").to_numpy()[:, 1:], repeats=1, axis=0)
-    train_data_y = np.repeat(pd.read_csv("MNIST_train_small.csv").to_numpy()[:, 0], repeats=1, axis=0)
-    test_data_x = np.repeat(pd.read_csv("MNIST_test_small.csv").to_numpy()[:, 1:], repeats=1, axis=0)
-    test_data_y = np.repeat(pd.read_csv("MNIST_test_small.csv").to_numpy()[:, 0], repeats=1, axis=0)
+    # Unpack the archive if necessary
+    if not os.path.exists("MNIST_train.csv") and not os.path.exists("MNIST_test.csv"):
+        with zipfile.ZipFile("MNIST_big_datasets.zip", 'r') as zip_ref:
+            zip_ref.extractall()
+
+    train_data_x = pd.read_csv("MNIST_train_small.csv").to_numpy()[:, 1:]
+    train_data_y = pd.read_csv("MNIST_train_small.csv").to_numpy()[:, 0]
+    test_data_x = pd.read_csv("MNIST_test_small.csv").to_numpy()[:, 1:]
+    test_data_y = pd.read_csv("MNIST_test_small.csv").to_numpy()[:, 0]
+
+    train_data_x_large = pd.read_csv("MNIST_train.csv").to_numpy()[:60000, 1:]
+    train_data_y_large = pd.read_csv("MNIST_train.csv").to_numpy()[:60000, 0]
+    test_data_x_large = pd.read_csv("MNIST_train.csv").to_numpy()[:60000, 1:]
+    test_data_y_large = pd.read_csv("MNIST_train.csv").to_numpy()[:60000, 0]
+
     t0 = time.time()
 
-    exercise_c()
+    exercise_e()
     print(time.time() - t0)
