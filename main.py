@@ -167,7 +167,8 @@ def exercise_e():
     # now, for every item of the training set, verify if the k-means algorithm predicts a good label
     def job(i):
         correct = [0 for _ in range(20)]
-        print(i)
+        if(i % 100 == 0 or i < 20):
+            print("%s : %s" % (i, time.time()))
 
         # save the to-be removed value in dummy variables
         dummy_x = train_data_x_large[i]
@@ -187,7 +188,7 @@ def exercise_e():
 
         return correct
 
-    list_of_corrects = Parallel(n_jobs=n_cores)(delayed(job)(i) for i in range(len(train_data_x_large)))
+    list_of_corrects = Parallel(n_jobs=-1)(delayed(job)(i) for i in range(len(train_data_x_large)))
     correct = np.array(list_of_corrects).sum(axis=0)
 
     max_correct_value = max(correct)
